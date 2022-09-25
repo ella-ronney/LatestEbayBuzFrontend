@@ -1,0 +1,200 @@
+<template>
+    <div>
+        <div class="text-center">
+            <h2>Profit Manager</h2>
+        </div>
+        <div class="mx-5">
+            <h5>Profit For The Year To Date: {{totalProfit}}</h5>
+        </div>
+        <div class="mx-5">
+            <h5>Profit Breakdown</h5>
+            <b-table id="monthlyProfit" stripped bordered hover :items="mProfit" :fields="months"></b-table>
+        </div>
+        <div class="mx-5">
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="sale = !sale">Add Sale</button>
+        </div>
+        <div class="mx-5" v-if="sale">
+            <h2 class="d-flex justify-content-center">Sale Details</h2>
+            <b-card bg-variant="light">
+                <h5 class="mt-2">Sale Type</h5>
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Type of Sale"><b-form-select v-model="profitForm.saleType" :options="typeOfSale" class="form-select form-select-font-size-lg"></b-form-select></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5 class="mt-2">Sale Details</h5>
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col v-if="profitForm.saleType=='Adorama'"><b-form-group label="Name"><b-form-input v-model="profitForm.soldItemName"></b-form-input></b-form-group></b-col>
+                            <b-col v-if="profitForm.saleType!='Adorama'"><b-form-group label="eBay Id"><b-form-input v-model="profitForm.ebayId"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label=" Quantity Sold"><b-form-input type="number" v-model="profitForm.qtySold"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col><b-form-group label="Record Date"><b-form-input type="date" v-model="profitForm.recordDate"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5 class="mt-2">Pricing Details</h5>
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col v-if="profitForm.saleType=='Adorama'"><b-form-group label="Total Cost"><b-form-input v-model="profitForm.totalCost"></b-form-input></b-form-group></b-col>
+                            <b-col v-if="profitForm.saleType!='Adorama'"><b-form-group label="Shipping Costs"><b-form-input v-model="profitForm.shippingCost"></b-form-input></b-form-group></b-col>
+                            <b-col v-if="profitForm.saleType=='Adorama'"><b-form-group label="Sales Tax"><b-form-input v-model="profitForm.salesTax"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="eBay Fees"><b-form-input v-model="profitForm.ebayFees"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="eBay Promo Fees"><b-form-input v-model="profitForm.promoFees"></b-form-input></b-form-group></b-col>
+                            <b-col> <b-form-group label="Total Price Sold"><b-form-input v-model="profitForm.totalPriceSold"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+            </b-card>
+            <div style="display: flex; justify-content: flex-end" class="mt-3">
+                <button class="btn btn-success btn-sm" @click="SendProfitForm()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
+            </div>
+            <b-card header="Form Data Results">
+                <pre class="m-0">{{profitForm}}</pre>
+            </b-card>
+        </div>
+        <div class="mx-5">
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="quickAdd = !quickAdd">Short - Add Sale</button>
+        </div>
+        <div class="mx-5" v-if="quickAdd">
+            <h2 class="d-flex justify-content-center">Sale Details</h2>
+            <b-card bg-variant="light">
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Name"><b-form-input v-model="quickProfitForm.itemName"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Type of Sale"><b-form-select v-model="quickProfitForm.saleType" :options="typeOfSale" class="form-select form-select-font-size-lg"></b-form-select></b-form-group></b-col>
+                            <b-col><b-form-group label=" Quantity Sold"><b-form-input type="number" v-model="quickProfitForm.qtySold"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Record Date"><b-form-input type="date" v-model="quickProfitForm.recordDate"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col><b-form-group label="Total Cost"><b-form-input v-model="quickProfitForm.totalCost"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Shipping Costs"><b-form-input v-model="quickProfitForm.shippingCost"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="eBay Fees"><b-form-input v-model="quickProfitForm.ebayFees"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="eBay Promo Fees"><b-form-input v-model="quickProfitForm.promoFees"></b-form-input></b-form-group></b-col>
+                            <b-col> <b-form-group label="Total Price Sold"><b-form-input v-model="quickProfitForm.totalPriceSold"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+            </b-card>
+            <div style="display: flex; justify-content: flex-end" class="mt-3">
+                <button class="btn btn-success btn-sm" @click="SendQuickProfitForm()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import axios from 'axios';
+    export default {
+        name: 'Profit',
+        methods: {
+            GetData() {
+                axios.get("https://localhost:44314/sales/totalprofit")
+                    .then((response) => {
+                        this.totalProfit = response.data;
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+                axios.get("https://localhost:44314/sales/monthlyprofit")
+                    .then((response) => {
+                        this.mProfit = response.data;
+                    })
+            },
+            SendProfitForm() {
+                axios.post("https://localhost:44314/sales/addsalesrecord",this.profitForm)
+                    .then((response) => {
+                        this.clearProfitForm();
+                        console.log(response);
+                    }, (error) => {
+                        this.clearProfitForm();
+                        console.log(error);
+                    });
+            },
+            SendQuickProfitForm() {
+                axios.post("https://localhost:44314/sales/addquicksalesrecord", this.quickProfitForm)
+                    .then((response) => {
+                        this.clearQuickProfitForm();
+                        console.log(response);
+                    }, (error) => {
+                        this.clearQuickProfitForm();
+                        console.log(error);
+                    });
+            },
+            clearProfitForm() {
+                this.profitForm.itemName = '';
+                this.profitForm.totalCost = '';
+                this.profitForm.qtySold = '';
+                this.profitForm.totalPriceSold = '';
+                this.profitForm.saleType = '';
+                this.profitForm.recordDate = '';
+                this.profitForm.ebayId = '';
+                this.profitForm.shippingCost = '';
+                this.profitForm.ebayFees = '';
+                this.profitForm.promoFees = '';
+                this.profitForm.salesTax = '';
+            },
+            clearQuickProfitForm() {
+                this.quickProfitForm.itemName = '';
+                this.quickProfitForm.totalCost = '';
+                this.quickProfitForm.shippingCost = '';
+                this.quickProfitForm.ebayFees = '';
+                this.quickProfitForm.promoFees = '';
+                this.quickProfitForm.qtySold = '';
+                this.quickProfitForm.totalPriceSold = '';
+                this.quickProfitForm.saleType = '';
+                this.quickProfitForm.recordDate = '';
+            },
+        },
+        data() {
+            return {
+                profitForm: {
+                    itemName: '',
+                    totalCost: '',
+                    shippingCost: '',
+                    ebayFees: '',
+                    promoFees: '',
+                    qtySold: '',
+                    totalPriceSold: '',
+                    saleType: '',
+                    recordDate: '',
+                    ebayId: '',
+                    salesTax: '',
+                },
+                quickProfitForm: {
+                    itemName: '',
+                    totalCost: '',
+                    shippingCost: '',
+                    ebayFees: '',
+                    promoFees: '',
+                    qtySold: '',
+                    totalPriceSold: '',
+                    saleType: '',
+                    recordDate: '',
+                },
+                typeOfSale: ['Adorama', 'eBay', 'Facebook'],
+                months: ['month','sum'],
+                totalProfit: '',
+                mProfit: [],
+                sale: false,
+                quickAdd: false,
+            }
+        },
+        mounted: function () {
+            this.GetData();
+        }
+    }
+</script>
+
+<style scoped>
+    table {
+        --bs-table-striped-bg: #bcedf761;
+        --bs-table-hover-bg: #67e7efa8;
+    }
+</style>
