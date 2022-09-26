@@ -18,6 +18,11 @@
                                 Profit Manager
                             </router-link>
                         </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="BusinessExpenses">
+                                Business Expense Manager
+                            </router-link>
+                        </li>
                     </ul>
                 </div>
             </div>
