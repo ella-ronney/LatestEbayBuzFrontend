@@ -4,7 +4,8 @@
             <h2>Expense Manager</h2>
         </div>
         <div class="mx-5">
-            <h2>{{this.currentYear}} Business Expenses</h2>
+            <h2>Total eBay Payouts: $ 118,719.62</h2>
+            <h2>{{this.currentYear}} Business Expenses to 9/27</h2>
             <b-table striped bordered hover :items="businessExpenses" :fields="expenses"></b-table>
             <h2>Insurance Expenses</h2>
             <b-table :items="insuranceExpenses" striped bordered hover :fields="insuranceFields"></b-table>
@@ -130,13 +131,13 @@
 
                 insuranceOptions: ['Claim Refund', 'Insurance Cost', 'Lost Inventory', 'Money Saved'],
                 paymentMethods: ['Wells Fargo - 4524', 'Wells Fargo - 0777', 'Wells Fargo - 9386', 'Wells Fargo - Checking',
-                    'Chase - Amazon', 'Chase - Freedom',
+                    'Chase - Amazon', 'Chase - Freedom', 'Chase - Checking',
                     'American Express - 41002', 'American Express - 01009', 'American Express - Amazon',
-                    'PayPal', 'Sychrony'],
+                    'PayPal', 'Sychrony', 'Target Card'],
                 expenseCategories: ['Supplies', 'Subscriptions',
                     'Office Space (Rent & Insurance)', 'Utilities',
                     'Food', 'Gas', 'Car Expenses (Insurance & Maintance)', 
-                    'Travel', 'Misc Business Expenses'],
+                    'Travel', 'Inventory', 'Shipping Costs', 'Internet', 'Misc Business Expenses'],
             }
         },
         mounted: function () {
