@@ -23,6 +23,11 @@
                                 Business Expense Manager
                             </router-link>
                         </li>
+                        <li class="nav-item">
+                            <router-link class="nav-link" to="ResolutionCenter">
+                                Resolution Center
+                            </router-link>
+                        </li>
                     </ul>
                 </div>
             </div>

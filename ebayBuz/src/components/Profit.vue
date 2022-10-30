@@ -11,7 +11,21 @@
             <b-table id="monthlyProfit" stripped bordered hover :items="mProfit" :fields="months"></b-table>
         </div>
         <div class="mx-5">
-            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="sale = !sale">Add Sale</button>
+            <!--<button class="btn btn-info text-light" style="margin-right: 10px;" @click="sale = !sale">Add Sale</button>
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="quickAdd = !quickAdd">Short - Add Sale</button>-->
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="readExcelFile =!readExcelFile">Add Excel File</button>
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="showEbaySales = !showEbaySales">Show eBay Sales</button>
+        </div>
+        <div class="mx-5" v-if="readExcelFile">
+            <b-form-group label="eBay Excel File Name"><b-form-input v-model="eBayFilePath.name"></b-form-input></b-form-group>
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="ReadEbayExcelFile()">Read Excel File</button>
+            <h5>eBay Excel File Record Range: Jan - 10/28/22 </h5>
+        </div>
+        <div class="mx-5" v-if="showEbaySales">
+            <b-pagination v-model = "currentPage" :total-rows = "rows" :per-page = "perPage" aria-controls = "eBayRecords"></b-pagination>
+             <b-table id = "eBayRecords" stripped bordered hover :items="eBaySaleRecords" :per-page = "perPage" :currentPage = "currentPage" :fields = "eBaySaleRecordTableCol">
+
+             </b-table>
         </div>
         <div class="mx-5" v-if="sale">
             <h2 class="d-flex justify-content-center">Sale Details</h2>
@@ -58,9 +72,6 @@
                 <pre class="m-0">{{profitForm}}</pre>
             </b-card>
         </div>
-        <div class="mx-5">
-            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="quickAdd = !quickAdd">Short - Add Sale</button>
-        </div>
         <div class="mx-5" v-if="quickAdd">
             <h2 class="d-flex justify-content-center">Sale Details</h2>
             <b-card bg-variant="light">
@@ -105,6 +116,10 @@
                 axios.get("https://localhost:44314/sales/monthlyprofit")
                     .then((response) => {
                         this.mProfit = response.data;
+                    }),
+                axios.get("https://localhost:44314/EbaySaleRecord/eBayExcelSaleRecords")
+                    .then((response) => {
+                        this.eBaySaleRecords = response.data;
                     })
             },
             SendProfitForm() {
@@ -124,6 +139,14 @@
                         console.log(response);
                     }, (error) => {
                         this.clearQuickProfitForm();
+                        console.log(error);
+                    });
+            },
+            ReadEbayExcelFile() {
+                axios.post("https://localhost:44314/EbaySaleRecord/AddEbayExcelRecords", this.eBayFilePath)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
                         console.log(error);
                     });
             },
@@ -154,6 +177,10 @@
         },
         data() {
             return {
+                eBayFilePath: {
+                    name: '',
+                },
+                readExcelFile: false,
                 profitForm: {
                     itemName: '',
                     totalCost: '',
@@ -178,12 +205,30 @@
                     saleType: '',
                     recordDate: '',
                 },
+                eBaySaleRecordTableCol: [
+                    { key: 'listingTitle', label: 'Name' },
+                    { key: 'ebayItemId', label: 'eBay Item ID' },
+                    { key: 'quantitySold', label: 'Quantity Sold' },
+                    { key: 'totalSales', label: 'Total Sales' },
+                    { key: 'totalProfit', label: 'Total Profit' },
+                    { key: 'totalSellingCosts', label: 'Total Selling Costs' },
+                    { key: 'avgSellingPrice', lable: 'Avg Selling Price'},
+                ],
                 typeOfSale: ['Adorama', 'eBay', 'Facebook'],
                 months: ['month','sum'],
                 totalProfit: '',
                 mProfit: [],
+                eBaySaleRecords: [],
+                perPage: 30,
+                currentPage: 1,
+                showEbaySales: false,
                 sale: false,
                 quickAdd: false,
+            }
+        },
+        computed: {
+            rows() {
+                return this.eBaySaleRecords.length;
             }
         },
         mounted: function () {
