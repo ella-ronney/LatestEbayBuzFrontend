@@ -22,10 +22,31 @@
             <h5>eBay Excel File Record Range: Jan - 10/28/22 </h5>
         </div>
         <div class="mx-5" v-if="showEbaySales">
-            <b-pagination v-model = "currentPage" :total-rows = "rows" :per-page = "perPage" aria-controls = "eBayRecords"></b-pagination>
-             <b-table id = "eBayRecords" stripped bordered hover :items="eBaySaleRecords" :per-page = "perPage" :currentPage = "currentPage" :fields = "eBaySaleRecordTableCol">
-
-             </b-table>
+            <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="eBayRecords"></b-pagination>
+            <b-table id="eBayRecords" stripped bordered hover :items="eBaySaleRecords" :per-page="perPage" :currentPage="currentPage" :fields="eBaySaleRecordTableCol">
+                <template #cell(quantitySold)="data">
+                    <b-form-input v-model="data.value" typeof="number"></b-form-input>
+                </template>
+                <template #cell(totalSales)="data">
+                    <b-form-input v-model="data.value" typeof="double"></b-form-input>
+                </template>
+                <template #cell(totalProfit)="data">
+                    <b-form-input v-model="data.value" typeof="double"></b-form-input>
+                </template>
+                <template #cell(totalSellingCosts)="data">
+                    <b-form-input v-model="data.value" type="double"></b-form-input>
+                </template>
+                <template #cell(avgSellingPrice)="data">
+                    <b-form-input v-model="data.value" typeof="double"></b-form-input>
+                </template>
+                <template #cell(edit)="data">
+                    <b-form-checkbox size="xl" @change="getCheckedEbaySales(data.item, data.rowSelected)" v-model="data.rowSelected"></b-form-checkbox>
+                </template>
+            </b-table>
+            <div style="display: flex; justify-content: flex-end">
+                <button class="btn btn-danger btn-sm"><b-icon-trash font-scale="2"></b-icon-trash></button>
+                <button class="btn btn-info btn-sm"><b-icon-arrow-clockwise font-scale="2" variant="light"></b-icon-arrow-clockwise></button>
+            </div>
         </div>
         <div class="mx-5" v-if="sale">
             <h2 class="d-flex justify-content-center">Sale Details</h2>
@@ -122,6 +143,17 @@
                         this.eBaySaleRecords = response.data;
                     })
             },
+            UpdateEbaySaleRecords() {
+                axios.put("https://localhost:44314/EbaySaleRecord/", this.eBaySaleRecordsSelected)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+            },
+            /*DeleteEbaySaleRecords() {
+
+            },*/
             SendProfitForm() {
                 axios.post("https://localhost:44314/sales/addsalesrecord",this.profitForm)
                     .then((response) => {
@@ -149,6 +181,15 @@
                     }, (error) => {
                         console.log(error);
                     });
+            },
+            getCheckedEbaySales(item, checked) {
+                if (checked) {
+                    console.log(item.listingTitle);
+                    this.eBaySaleRecordsSelected.push(item);
+                }
+                else {
+                    this.eBaySaleRecordsSelected = this.eBaySaleRecordsSelected.filter(i => i.idEbaySaleRecord != item.idEbaySaleRecord);
+                }
             },
             clearProfitForm() {
                 this.profitForm.itemName = '';
@@ -212,13 +253,15 @@
                     { key: 'totalSales', label: 'Total Sales' },
                     { key: 'totalProfit', label: 'Total Profit' },
                     { key: 'totalSellingCosts', label: 'Total Selling Costs' },
-                    { key: 'avgSellingPrice', lable: 'Avg Selling Price'},
+                    { key: 'avgSellingPrice', label: 'Avg Selling Price' },
+                    { key: 'edit', label: 'Edit'},
                 ],
                 typeOfSale: ['Adorama', 'eBay', 'Facebook'],
                 months: ['month','sum'],
                 totalProfit: '',
                 mProfit: [],
                 eBaySaleRecords: [],
+                eBaySaleRecordsSelected: [],
                 perPage: 30,
                 currentPage: 1,
                 showEbaySales: false,

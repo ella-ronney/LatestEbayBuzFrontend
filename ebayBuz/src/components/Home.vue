@@ -186,6 +186,7 @@
                         console.log(error);
                     });
             },
+            // TODO FIXME - wont update if ebay item id isnt changed
             updateCurrentInv() {
                 axios.put("https://localhost:44314/inventory/UpdateCurrentInventory", this.updatedCurrInv)
                     .then((response) => {
