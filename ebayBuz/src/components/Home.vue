@@ -315,7 +315,7 @@
                     { key: 'edit', label: 'Edit' }
                 ],
                 paymentMethods: ['Wells Fargo - 0777', 'Wells Fargo - 9386', 'Wells Fargo - Checking',
-                    'Chase - Amazon', 'Chase - Freedom',
+                    'Wells Fargo -  4524', 'Chase - Amazon', 'Chase - Freedom',
                     'American Express - 41002', 'American Express - 01009', 'American Express - Amazon',
                     'PayPal', 'Sychrony'],
                 vendors: ['Amazon', 'Woot', 'Best Buy', 'B&H', 'Target', 'Harman Audio', 'Vitamix', 'Costco', 'eBay'],
