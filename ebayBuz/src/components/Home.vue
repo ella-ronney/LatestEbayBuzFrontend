@@ -14,7 +14,7 @@
                     <b-form-input v-model="data.value" @change="updateEbayId(data.item, data.value)" style="width:9em"></b-form-input>
                 </template>
                 <template #cell(qty)="data">
-                    <b-form-input v-model="data.value" type="number"></b-form-input>
+                    <b-form-input v-model="data.value" type="number" @change="updateCurrentInvItemQty(data.item,data.value)"></b-form-input>
                 </template>
                 <template #cell(datePurchased)="data">
                     <b-form-datepicker size="sm" v-model="data.value" :date-format-options="{year: 'numeric', month: 'numeric', date: 'numeric'}"></b-form-datepicker>
@@ -186,7 +186,18 @@
                         console.log(error);
                     });
             },
+            updateCurrentInvItemQty(item, value) {
+                item.qty = value;
+                this.updatedCurrInv.push(item);
+                axios.put("https://localhost:44314/inventory/UpdateCurrentInventoryQty", this.updatedCurrInv)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+            },
             // TODO FIXME - wont update if ebay item id isnt changed
+            // TODO change to update ebay item id function 
             updateCurrentInv() {
                 axios.put("https://localhost:44314/inventory/UpdateCurrentInventory", this.updatedCurrInv)
                     .then((response) => {

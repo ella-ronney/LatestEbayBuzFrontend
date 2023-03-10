@@ -11,17 +11,11 @@
             <h2>Insurance Expenses</h2>
             <b-table :items="insuranceExpenses" striped bordered hover :fields="insuranceFields"></b-table>
             <h2>Car Mileage Log</h2>
-            <b-table :items="a" striped bordered hover :fields="carRecordFields"></b-table>
-        </div>
-        <div class="mx-5">
-            <h2>WA</h2>
-            <p2>Total Car Mileage 2022: 4000 </p2>
-            <p2>Business Car Mileage 2022: 101 d * 3.8 miles = 383.8 miles </p2>
-            <p2>Percentage of Business Use: 9.595%</p2>
-            <h2>FL</h2>
-            <p2>Total Car Mileage 2022: 8000</p2>
-            <p2>Business Car Mileage 2022: 130 d * 9.2 miles = 1,196 miles</p2>
-            <p2>Percentage of Business Use: 14.95%</p2>
+            <b-table :items="carLogs" striped bordered hover :fields="carRecordFields">
+                <template #cell(totalMiles)="data">
+                    <b-form-input v-model="data.value" @change="updateCarTotalMiles(data.item, data.value)"></b-form-input>
+                </template>
+            </b-table>
         </div>
         <div class="mx-5">
             <button class="btn btn-info text-light" style="margin-right: 10px;" @click="buzExpense = !buzExpense">Add Business Expense</button>
@@ -139,6 +133,12 @@
                         this.businessExpenses = response.data;
                     });
             },
+            getCarLogs() {
+                axios.get("https://localhost:44314/BusinessExpenses/YearlyCarLogs")
+                    .then((response) => {
+                        this.carLogs = response.data;
+                    });
+            },
             addCarLog() {
                 axios.post("https://localhost:44314/BusinessExpenses/AddCarLog", this.carForm)
                     .then((response) => {
@@ -146,6 +146,18 @@
                         this.resetCarForm();
                     }, (error) => {
                         console.log(error);
+                    });
+            },
+            updateCarTotalMiles(item, val) {
+                item.totalMiles = val;
+                this.updatedCarLogs.push(item);
+                axios.put("https://localhost:44314/BusinessExpenses/UpdateCarLogTotalMiles", this.updatedCarLogs)
+                    .then((response) => {
+                        console.log(response);
+                        this.updatedCarLogs = [];
+                    }, (error) => {
+                        console.log(error);
+                        this.updatedCarLogs = [];
                     });
             },
         },
@@ -195,6 +207,7 @@
                     { key: 'miscExpenses', label: 'Misc. Expenses' }
                 ],
                 carRecordFields: [
+                    { key: 'year', label: 'Year'},
                     { key: 'car', label: 'Car' },
                     { key: 'businessMiles', label: 'Business Miles' },
                     { key: 'totalMiles', label: 'Total Miles' },
@@ -205,6 +218,8 @@
                 // Atributes
                 insuranceExpenses: [],
                 businessExpenses: [],
+                carLogs: [],
+                updatedCarLogs: [],
                 buzExpense: false,
                 insExpense: false,
                 carRecord: false,
@@ -228,6 +243,7 @@
         },
         mounted: function () {
             this.getExpenses();
+            this.getCarLogs();
         }
     };
 </script>

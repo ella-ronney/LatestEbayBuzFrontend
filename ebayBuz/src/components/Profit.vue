@@ -17,27 +17,26 @@
             <button class="btn btn-info text-light" style="margin-right: 10px;" @click="showEbaySales = !showEbaySales">Show eBay Sales</button>
         </div>
         <div class="mx-5" v-if="readExcelFile">
-            <b-form-group label="eBay Excel File Name"><b-form-input v-model="eBayFilePath.name"></b-form-input></b-form-group>
-            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="ReadEbayExcelFile()">Read Excel File</button>
-            <h5>eBay Excel File Record Range: Jan - 10/28/22 </h5>
+            <b-card bg-variant="light">
+                <b-card>
+                    <b-row>
+                        <b-form-group label="eBay Excel File Name"><b-form-input v-model="eBayExcelFile.filePath"></b-form-input></b-form-group>
+                    </b-row>
+                    <b-row>
+                        <b-col><b-form-group label="Start Date"><b-form-input v-model="eBayExcelFile.startDate" type="date"></b-form-input></b-form-group></b-col>
+                        <b-col><b-form-group label="End Date"><b-form-input v-model="eBayExcelFile.endDate" type="date"></b-form-input></b-form-group></b-col>
+                    </b-row>
+                </b-card>
+            </b-card>
+            <div style="display: flex; justify-content: flex-end" class="mt-3">
+                <button class="btn btn-info text-light" style="margin-right: 10px;" @click="ReadEbayExcelFile()">Read Excel File</button>
+            </div>
         </div>
         <div class="mx-5" v-if="showEbaySales">
             <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="eBayRecords"></b-pagination>
             <b-table id="eBayRecords" stripped bordered hover :items="eBaySaleRecords" :per-page="perPage" :currentPage="currentPage" :fields="eBaySaleRecordTableCol">
-                <template #cell(quantitySold)="data">
-                    <b-form-input v-model="data.value" typeof="number"></b-form-input>
-                </template>
-                <template #cell(totalSales)="data">
-                    <b-form-input v-model="data.value" typeof="double"></b-form-input>
-                </template>
-                <template #cell(totalProfit)="data">
-                    <b-form-input v-model="data.value" typeof="double"></b-form-input>
-                </template>
                 <template #cell(totalSellingCosts)="data">
-                    <b-form-input v-model="data.value" type="double"></b-form-input>
-                </template>
-                <template #cell(avgSellingPrice)="data">
-                    <b-form-input v-model="data.value" typeof="double"></b-form-input>
+                    <b-form-input v-model="data.value" type="double" @change="UpdateEbaySaleRecords(data.item,data.value)"></b-form-input>
                 </template>
                 <template #cell(edit)="data">
                     <b-form-checkbox size="xl" @change="getCheckedEbaySales(data.item, data.rowSelected)" v-model="data.rowSelected"></b-form-checkbox>
@@ -127,14 +126,14 @@
         name: 'Profit',
         methods: {
             GetData() {
-                axios.get("https://localhost:44314/sales/totalprofit")
+                axios.get("https://localhost:44314/EbaySaleRecord/totalprofit")
                     .then((response) => {
                         this.totalProfit = response.data;
                         console.log(response);
                     }, (error) => {
                         console.log(error);
                     });
-                axios.get("https://localhost:44314/sales/monthlyprofit")
+                axios.get("https://localhost:44314/EbaySaleRecord/monthlyprofit")
                     .then((response) => {
                         this.mProfit = response.data;
                     }),
@@ -143,8 +142,10 @@
                         this.eBaySaleRecords = response.data;
                     })
             },
-            UpdateEbaySaleRecords() {
-                axios.put("https://localhost:44314/EbaySaleRecord/", this.eBaySaleRecordsSelected)
+            UpdateEbaySaleRecords(item, value) {
+                item.totalSellingCosts = value;
+                this.eBaySaleRecordsToUpdate.push(item);
+                axios.put("https://localhost:44314/EbaySaleRecord/UpdateEbaySaleRecord", this.eBaySaleRecordsToUpdate)
                     .then((response) => {
                         console.log(response);
                     }, (error) => {
@@ -175,7 +176,7 @@
                     });
             },
             ReadEbayExcelFile() {
-                axios.post("https://localhost:44314/EbaySaleRecord/AddEbayExcelRecords", this.eBayFilePath)
+                axios.post("https://localhost:44314/EbaySaleRecord/AddEbayExcelRecords", this.eBayExcelFile)
                     .then((response) => {
                         console.log(response);
                     }, (error) => {
@@ -218,8 +219,10 @@
         },
         data() {
             return {
-                eBayFilePath: {
-                    name: '',
+                eBayExcelFile: {
+                    filePath: '',
+                    startDate: '',
+                    endDate: '',
                 },
                 readExcelFile: false,
                 profitForm: {
@@ -254,6 +257,7 @@
                     { key: 'totalProfit', label: 'Total Profit' },
                     { key: 'totalSellingCosts', label: 'Total Selling Costs' },
                     { key: 'avgSellingPrice', label: 'Avg Selling Price' },
+                    { key: 'profitPercentage', label: 'Profit Percentage'},
                     { key: 'edit', label: 'Edit'},
                 ],
                 typeOfSale: ['Adorama', 'eBay', 'Facebook'],
@@ -262,6 +266,7 @@
                 mProfit: [],
                 eBaySaleRecords: [],
                 eBaySaleRecordsSelected: [],
+                eBaySaleRecordsToUpdate: [],
                 perPage: 30,
                 currentPage: 1,
                 showEbaySales: false,
