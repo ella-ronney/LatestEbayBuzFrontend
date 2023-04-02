@@ -12,7 +12,7 @@
         </div>
         <div class="mx-5">
             <!--<button class="btn btn-info text-light" style="margin-right: 10px;" @click="sale = !sale">Add Sale</button>
-            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="quickAdd = !quickAdd">Short - Add Sale</button>-->
+        <button class="btn btn-info text-light" style="margin-right: 10px;" @click="quickAdd = !quickAdd">Short - Add Sale</button>-->
             <button class="btn btn-info text-light" style="margin-right: 10px;" @click="readExcelFile =!readExcelFile">Add Excel File</button>
             <button class="btn btn-info text-light" style="margin-right: 10px;" @click="showEbaySales = !showEbaySales">Show eBay Sales</button>
         </div>
@@ -117,6 +117,39 @@
                 <button class="btn btn-success btn-sm" @click="SendQuickProfitForm()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
             </div>
         </div>
+        <div class="mx-5" style="margin-top:25px;">
+            <h5>Non WA Sells</h5>
+            <button class="btn btn-info text-light" style="margin-right: 10px" @click="nonWASell = !nonWASell">Add Non Wa Sell Record</button>
+            <button class="btn btn-info text-light" style="margin-right: 10px" @click="showNonWASells = !showNonWASells">Show Non WA Sells</button>
+        </div>
+        <div class="mx-5" v-if="nonWASell">
+            <h2 class="d-flex justify-content-center">Non WA Sale Form</h2>
+            <b-card bg-variant="light">
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Ebay Item Id"><b-form-input v-model="nonWASaleForm.ebayItemId"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Name"><b-form-input v-model="nonWASaleForm.name"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Qty"><b-form-input v-model="nonWASaleForm.qty" type="number"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col><b-form-group label="Quarter"><b-form-select v-model="nonWASaleForm.quarter" :options="quarter" class="form-select form-select-font-size-lg"></b-form-select></b-form-group></b-col>
+                            <b-col><b-form-group label="Year"><b-form-input v-model="nonWASaleForm.year"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+            </b-card>
+            <div style="display: flex; justify-content: flex-end" class="mt-3">
+                <button class="btn btn-success btn-sm" @click="AddNonWASaleRecord()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
+            </div>
+        </div>
+        <div class="mx-5" v-if="showNonWASells">
+            <b-table id="nonWASaleRecords" stripped bordered hover :items="nonWASaleRecords" :per-page="perPage" :currentPage="currentPage" :fields="nonWASaleRecordFields">
+                <template #cell(qty)="data">
+                    <b-form-input v-model="data.value" type="int" @change="UpdateNonWASell(data.item,data.value)"></b-form-input>
+                </template>
+            </b-table>
+        </div>
     </div>
 </template>
 
@@ -140,7 +173,12 @@
                 axios.get("https://localhost:44314/EbaySaleRecord/eBayExcelSaleRecords")
                     .then((response) => {
                         this.eBaySaleRecords = response.data;
+                    }),
+                axios.get("https://localhost:44314/EbaySaleRecord/NonWASells")
+                    .then((response) => {
+                        this.nonWASaleRecords = response.data;
                     })
+                
             },
             UpdateEbaySaleRecords(item, value) {
                 item.totalSellingCosts = value;
@@ -151,6 +189,7 @@
                     }, (error) => {
                         console.log(error);
                     });
+                this.eBaySaleRecordsToUpdate = [];
             },
             /*DeleteEbaySaleRecords() {
 
@@ -182,6 +221,26 @@
                     }, (error) => {
                         console.log(error);
                     });
+            },
+            AddNonWASaleRecord() {
+                axios.post("https://localhost:44314/EbaySaleRecord/AddNonWASale", this.nonWASaleForm)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+                this.clearNonWASaleForm();
+            },
+            UpdateNonWASell(item, value) {
+                item.qty = value;
+                this.nonWaSaleRecordsToUpdate.push(item);
+                axios.put("https://localhost:44314/EbaySaleRecord/UpdateNonWASells", this.nonWaSaleRecordsToUpdate)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+                this.nonWaSaleRecordsToUpdate = [];
             },
             getCheckedEbaySales(item, checked) {
                 if (checked) {
@@ -216,6 +275,11 @@
                 this.quickProfitForm.saleType = '';
                 this.quickProfitForm.recordDate = '';
             },
+            clearNonWASaleForm() {
+                this.nonWASaleForm.name = '';
+                this.nonWASaleForm.ebayItemId = '';
+                this.nonWASaleForm.qty = 0;
+            }
         },
         data() {
             return {
@@ -223,6 +287,8 @@
                     filePath: '',
                     startDate: '',
                     endDate: '',
+                    quarter: '',
+                    year: ''
                 },
                 readExcelFile: false,
                 profitForm: {
@@ -237,6 +303,11 @@
                     recordDate: '',
                     ebayId: '',
                     salesTax: '',
+                },
+                nonWASaleForm: {
+                    ebayItemId: '',
+                    name: '',
+                    qty: ''
                 },
                 quickProfitForm: {
                     itemName: '',
@@ -260,18 +331,30 @@
                     { key: 'profitPercentage', label: 'Profit Percentage'},
                     { key: 'edit', label: 'Edit'},
                 ],
+                nonWASaleRecordFields: [
+                    { key: 'ebayItemId', Label: 'Ebay Item Id' },
+                    { key: 'name', Label: 'Name' },
+                    { key: 'qty', Label: 'Qty' },
+                    { key: 'quarter', Label: 'Quarter' },
+                    { key: 'year', Label: 'Year'}
+                ],
                 typeOfSale: ['Adorama', 'eBay', 'Facebook'],
-                months: ['month','sum'],
+                months: ['month', 'sum'],
+                quarter: ['Q1','Q2','Q3','Q4'],
                 totalProfit: '',
                 mProfit: [],
                 eBaySaleRecords: [],
                 eBaySaleRecordsSelected: [],
                 eBaySaleRecordsToUpdate: [],
+                nonWASaleRecords: [],
+                nonWaSaleRecordsToUpdate: [],
                 perPage: 30,
                 currentPage: 1,
                 showEbaySales: false,
                 sale: false,
                 quickAdd: false,
+                nonWASell: false,
+                showNonWASells: false
             }
         },
         computed: {

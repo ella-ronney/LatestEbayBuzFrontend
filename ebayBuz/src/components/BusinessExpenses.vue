@@ -6,7 +6,7 @@
         <div class="mx-5">
             <h2>Total eBay Payouts: $ 137,800.5</h2>
             <h2> Dad Payments: $ 13,000.00</h2>
-            <h2>{{this.currentYear}} Business Expenses to 11/08</h2>
+            <h2>{{this.currentYear}} Business Expenses to 3/31</h2>
             <b-table striped bordered hover :items="businessExpenses" :fields="expenses"></b-table>
             <h2>Insurance Expenses</h2>
             <b-table :items="insuranceExpenses" striped bordered hover :fields="insuranceFields"></b-table>
@@ -32,6 +32,7 @@
                     <b-container>
                         <b-row>
                             <b-col><b-form-group label="Expense Category"><b-form-select v-model="expenseForm.expenseCategory" class="form-select form-select-font-size-lg" :options="expenseCategories"></b-form-select></b-form-group></b-col>
+                            <b-col><b-form-group label="Business %"><b-form-input v-model="expenseForm.businessPercentage"></b-form-input></b-form-group></b-col>
                         </b-row>
                         <b-row>
                             <b-col><b-form-group label="Cost"><b-form-input v-model="expenseForm.cost"></b-form-input></b-form-group></b-col>
@@ -93,6 +94,29 @@
                 <button class="btn btn-success btn-sm" @click="addCarLog()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
             </div>
         </div>
+        <div class="mx-5">
+            <h2>Quarterly Reporting</h2>
+            <h4>Washingtion</h4>
+            <h4>FL</h4>
+            <p>TODO Remove this section </p>
+            <p>TODO Button functionality</p>
+            
+            <b-card bg-variant="light">
+                <h5>Quarter Reporting Form</h5>
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="FL Sells"><b-form-input v-model="quarterReportingForm.flSells"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Quarter"><b-form-select v-model="quarterReportingForm.quarter" class="form-select form-select-font-size-lg" :options="quarters"></b-form-select></b-form-group></b-col>
+                            <b-col><b-form-group label="Year"><b-form-input v-model="quarterReportingForm.year"></b-form-input></b-form-group></b-col>
+                    </b-row>
+                    </b-container>
+                </b-card>
+                <div style="display:flex; justify-content:flex-end" class="mt-3">
+                    <button class="btn btn-info text-light" @click="getQuarterlyExpenses()">Get Quarterly Expenses</button>
+                </div>
+            </b-card>
+        </div>
     </div>
 </template>
 
@@ -133,6 +157,14 @@
                         this.businessExpenses = response.data;
                     });
             },
+            getQuarterlyExpenses() {
+                axios.post("https://localhost:44314/BusinessExpenses/GetQuarterlyReporting", this.quarterReportingForm)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+            },
             getCarLogs() {
                 axios.get("https://localhost:44314/BusinessExpenses/YearlyCarLogs")
                     .then((response) => {
@@ -164,6 +196,11 @@
         data() {
             return {
                 // Forms
+                quarterReportingForm: {
+                    flSells: '',
+                    quarter: '',
+                    year: ''
+                },
                 expenseForm: {
                     expenseVendor: '',
                     expenseName: '',
@@ -171,6 +208,7 @@
                     cost: '',
                     paymentInfo: '',
                     purchaseDate: '',
+                    businessPercentage: ''
                 },
                 insuranceForm: {
                     amount: '',
@@ -199,12 +237,12 @@
                     { key: 'supplies', label: 'Supplies' },
                     { key: 'subscriptions', label: 'Subscriptions' },
                     { key: 'officeSpace', label: 'Office Space' },
-                    { key: 'utilities', label: 'Utilities' },
+                    { key: 'officeFurniture', label: 'Office Furniture'},
                     { key: 'food', label: 'Food' },
-                    { key: 'gas', label: 'Gas' },
                     { key: 'car', label: 'Car' },
                     { key: 'travel', label: 'Travel'},
-                    { key: 'miscExpenses', label: 'Misc. Expenses' }
+                    { key: 'miscExpenses', label: 'Misc. Expenses' },
+                    { key: 'taxes', label: 'Taxes'}
                 ],
                 carRecordFields: [
                     { key: 'year', label: 'Year'},
@@ -233,12 +271,14 @@
                 expenseCategories: ['Supplies', 'Subscriptions',
                     'Office Space (Rent & Insurance)', 'Utilities',
                     'Food', 'Gas', 'Car Expenses (Insurance & Maintance)', 
-                    'Travel', 'Inventory', 'Shipping Costs', 'Internet', 'Misc Business Expenses'],
+                    'Travel', 'Inventory', 'Inventory Refunds', 'Shipping Costs', 'Internet',
+                    'Computer', 'Office Furniture', 'Misc Business Expenses', 'Taxes'],
                 carLocation: ['WA', 'FL'],
                 drivePurpose: ['Package DropOff', 'Business Supplies/Furniture'],
                 dropOffLocations: ['Redmond USPS', 'Bellevue USPS'],
                 recordAmount: ['Single', 'Multiple'],
                 boolDropDown: ['False', 'True'],
+                quarters: ['Q1','Q2','Q3','Q4'],
             }
         },
         mounted: function () {
