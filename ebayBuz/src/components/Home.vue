@@ -13,10 +13,10 @@
             <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="currentInventory"></b-pagination>
             <b-table id="currentInventory" striped bordered hover :items="current" :per-page="perPage" :current-page="currentPage" :fields="currFields">
                 <template #cell(ebayItemId)="data">
-                    <b-form-input v-model="data.value" @change="updateCurrentInv('ebayItemId',data.item, data.value)" style="width:9em"></b-form-input>
+                    <b-form-input v-model="data.value" @change="updateInv('ebayItemId',data.item, data.value)" style="width:9em"></b-form-input>
                 </template>
                 <template #cell(qty)="data">
-                    <b-form-input v-model="data.value" type="number" @change="updateCurrentInv('qty',data.item,data.value)"></b-form-input>
+                    <b-form-input v-model="data.value" type="number" @change="updateInv('qty',data.item,data.value)"></b-form-input>
                 </template>
                 <template #cell(datePurchased)="data">
                     <b-form-datepicker size="sm" v-model="data.value" :date-format-options="{year: 'numeric', month: 'numeric', date: 'numeric'}"></b-form-datepicker>
@@ -41,13 +41,16 @@
                     <template #cell(estimatedDelivery)="data">
                         <b-form-datepicker size="sm" v-model="data.value" :date-format-options="{year: 'numeric', month: 'numeric', date: 'numeric'}"></b-form-datepicker>
                     </template>
-                    <template #cell(edit)="data">
+                    <template #cell(delete)="data">
                         <b-form-checkbox size="xl" @change="deleteInv(false,data.item)" v-model="data.rowSelected"></b-form-checkbox>
+                    </template>
+                    <template #cell(moveCurrInv)="data">
+                        <b-form-checkbox size="x1" @change="updateInv('moveCurrInv',data.item, true)"></b-form-checkbox>
                     </template>
                 </b-table>
                 <div style="display: flex; justify-content: flex-end">
                     <!--<button class="btn btn-danger btn-sm" @click="deleteInv(false,data.item)"><b-icon-trash font-scale="2"></b-icon-trash></button>-->
-                    <button class="btn btn-primary btn-sm" @click="moveIncomingInv()"><b-icon-arrow-up font-scale="2" variant="light"></b-icon-arrow-up></button>
+                    <!--<button class="btn btn-primary btn-sm" @click="moveIncomingInv()"><b-icon-arrow-up font-scale="2" variant="light"></b-icon-arrow-up></button>-->
                     <button class="btn btn-info btn-sm"><b-icon-arrow-clockwise font-scale="2" variant="light"></b-icon-arrow-clockwise></button>
                 </div>
             </div>
@@ -177,7 +180,7 @@
                 deleteInv(isCurrentInv, item) {
                     this.invDelete.push(item);
                     console.log("test" + item.idInventory);
-                    axios.delete("https://localhost:44314/inventory/deleteinventory", { data: { ids: item.idInventory }  })
+                    axios.delete("https://localhost:44314/inventory/deleteinventory", { data: { id: item.idInventory }  })
                         .then((response) => {
                             console.log(response);
                             if (isCurrentInv) {
@@ -188,13 +191,14 @@
                                 const rowNum = this.incoming.findIndex(i => i.idInventory == item.idInventory);
                                 this.incoming.splice(rowNum, 1);
                             }
+                            item.checked = false;
                         }, (error) => {
                             console.log(error);
                         });
                 },
                 // TODO FIXME - wont update if ebay item id isnt changed
                 // TODO change to update ebay item id function
-                updateCurrentInv(variable,item,value) {
+                updateInv(variable,item,value) {
                     if (variable == 'ebayItemId') {
                         item.ebayItemId = value;
                         this.updatedCurrInv.push(item);
@@ -203,29 +207,24 @@
                         item.qty = value;
                         this.updatedCurrInv.push(item);
                     }
+                    if (variable == 'moveCurrInv') {
+                        item.currentInventory = value;
+                        this.updatedCurrInv.push(item);
+                    }
 
-                    axios.put("https://localhost:44314/inventory/UpdateCurrentInventory", this.updatedCurrInv)
+                    axios.put("https://localhost:44314/inventory/UpdateInventory", this.updatedCurrInv)
                         .then((response) => {
                             console.log(response);
+                            if (variable == 'moveCurrInv') {
+                                const rowNum = this.incoming.findIndex(i => i.idInventory == item.idInventory);
+                                this.current.push(this.incoming[rowNum]);
+                                this.incoming.splice(rowNum, 1);
+                            }
                         }, (error) => {
                             console.log(error);
                         });
 
                     this.updatedCurrInv = [];
-                },
-                moveIncomingInv() {
-                    axios.put("https://localhost:44314/inventory/moveincominginventory", this.incomingRowsSelected)
-                        .then((response) => {
-                            this.incomingRowsSelected.forEach((value, index) => {
-                                const rowNum = this.incoming.findIndex(i => i.idInventory == value);
-                                this.current.push(this.incoming[rowNum]);
-                                this.incoming.splice(rowNum, 1);
-                                console.log(value, index);
-                            });
-                            console.log(response);
-                        }, (error) => {
-                            console.log(error);
-                        });
                 },
                 getData() {
                     axios.get("https://localhost:44314/inventory/currentinventory")
@@ -321,7 +320,8 @@
                         { key: 'datePurchased', label: 'Date Purchased' },
                         { key: 'estimatedDelivery', label: 'Estimated Delivery' },
                         { key: 'trackingNumber', label: 'Tracking' },
-                        { key: 'edit', label: 'Edit' }
+                        { key: 'delete', label: 'Delete' },
+                        { key: 'moveCurrInv', label: 'Move Current Inv'}
                     ],
                     paymentMethods: ['Wells Fargo - 0777', 'Wells Fargo - 9386', 'Wells Fargo - Checking',
                         'Wells Fargo -  4524', 'Chase - Amazon', 'Chase - Freedom',
