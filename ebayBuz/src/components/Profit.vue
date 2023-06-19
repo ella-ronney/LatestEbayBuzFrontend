@@ -144,6 +144,7 @@
             </div>
         </div>
         <div class="mx-5" v-if="showNonWASells">
+            <p>As of : 5/16</p>
             <b-table id="nonWASaleRecords" stripped bordered hover :items="nonWASaleRecords" :per-page="perPage" :currentPage="currentPage" :fields="nonWASaleRecordFields">
                 <template #cell(qty)="data">
                     <b-form-input v-model="data.value" type="int" @change="UpdateNonWASell(data.item,data.value)"></b-form-input>

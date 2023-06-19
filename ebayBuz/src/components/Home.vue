@@ -4,14 +4,17 @@
             <h2>Inventory Manager</h2>
         </div>
         <div>
-            <p> TODO Search bar</p>
             <p> TODO Get Delete Working for Inventory table</p>
+            <p> TODO get pagination to match search / filter </p>
             <h5>Total Inventory Investment: {{invInvested}}</h5>
         </div>
         <div class="mx-5">
             <h2> Current Inventory</h2>
-            <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="currentInventory"></b-pagination>
-            <b-table id="currentInventory" striped bordered hover :items="current" :per-page="perPage" :current-page="currentPage" :fields="currFields">
+            <b-row>
+                <b-col cols="4"><b-input v-model="filter" placeholder="Filter Table"></b-input></b-col>
+                <b-col><b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="currentInventory"></b-pagination></b-col>
+            </b-row>
+            <b-table id="currentInventory" striped bordered hover :filter="filter" :items="current" :per-page="perPage" :current-page="currentPage" :fields="currFields">
                 <template #cell(ebayItemId)="data">
                     <b-form-input v-model="data.value" @change="updateInv('ebayItemId',data.item, data.value)" style="width:9em"></b-form-input>
                 </template>
@@ -105,7 +108,9 @@
                     <b-card>
                         <b-container>
                             <b-row>
-                                <b-col> <b-form-group label="Total Price"><b-form-input v-model="form.unitPrice" name="requiredInput"></b-form-input></b-form-group></b-col>
+                                <b-col><b-form-group label="Is Unit Price"><b-form-select :options="boolOptions" v-model="isUnitPrice" class="form-select form-select-font-size-lg"></b-form-select></b-form-group></b-col>
+                                <b-col v-if="isUnitPrice"><b-form-group label="Unit Price"><b-form-input v-model="form.unitPrice"></b-form-input></b-form-group></b-col>
+                                <b-col v-if="!isUnitPrice"> <b-form-group label="Total Price"><b-form-input v-model="form.unitPrice" name="requiredInput"></b-form-input></b-form-group></b-col>
                                 <b-col><b-form-group label="Sales Tax"><b-form-input v-model="form.salesTax"></b-form-input></b-form-group></b-col>
                                 <b-col><b-form-group label="Payment"><b-form-select v-model="form.payment" :options="paymentMethods" class="form-select form-select-font-size-lg" name="requiredInput"></b-form-select></b-form-group></b-col>
                             </b-row>
@@ -139,6 +144,9 @@
             components: {},
             methods: {
                 addInventory () {
+                    if (!this.isUnitPrice) {
+                        this.form.unitPrice = this.form.unitPrice / this.form.qty;
+                    }
                     alert(JSON.stringify(this.form));
                     axios.post("https://localhost:44314/inventory/addincominginventory", this.form)
                         .then((response) => {
@@ -219,6 +227,7 @@
                                 const rowNum = this.incoming.findIndex(i => i.idInventory == item.idInventory);
                                 this.current.push(this.incoming[rowNum]);
                                 this.incoming.splice(rowNum, 1);
+                                item.selected = false;
                             }
                         }, (error) => {
                             console.log(error);
@@ -285,6 +294,7 @@
                 return {
                     perPage: 5,
                     currentPage: 1,
+                    filter: '',
                     form: {
                         currentInventory: 'false', condition: 'New',
                         name: '', qty: '',
@@ -344,6 +354,7 @@
                     invIdNames: [],
                     invInvested: 0,
                     inventoryIds: [],
+                    isUnitPrice: false,
                 }
             },
             computed: {

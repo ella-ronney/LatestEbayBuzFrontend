@@ -6,7 +6,9 @@
         <div class="mx-5">
             <h2>Vendor Returns</h2>
             <b-table striped bordered hover :items="vendorReturns" :fields="vendorReturnFields">
-
+                <template #cell(delete)="data">
+                    <b-form-checkbox size="xl" @change="deleteReturn(data.item)" v-model="data.rowSelected"></b-form-checkbox>
+                </template>
             </b-table>
             <div style="display: flex; justify-content: flex-end">
                 <button class="btn btn-danger btm-sm" @click="deleteVendorReturn()"><b-icon-trash font-scale="2"></b-icon-trash></button>
@@ -94,6 +96,27 @@
                         console.log(error);
                     });
             },
+            getRecords() {
+                axios.get("https://localhost:44314/ResolutionCenter/VendorReturns")
+                    .then((response) => {
+                        this.vendorReturns = response.data;
+                    });
+                axios.get("https://localhost:44314/ResolutionCenter/eBayReturns")
+                    .then((response) => {
+                        this.eBayReturns = response.data;
+                    });
+            },
+            deleteReturn(item) {
+                axios.delete("https://localhost:44314/ResolutionCenter/DeleteReturn", { data: { id: item.idReturns } })
+                    .then((response) => {
+                        console.log(response);
+                        const rowNum = this.vendorReturns.findIndex(i => i.idReturns == item.idReturns);
+                        this.vendorReturns.splice(rowNum, 1);
+                        item.checked = false;
+                    }, (error) => {
+                        console.log(error);
+                    });
+            },
             clearForm() {
                 this.returnForm.returnItemName = '';
                 this.returnForm.returnedQty = 0;
@@ -111,6 +134,8 @@
         },
         data() {
             return {
+                vendorReturns: [],
+                eBayReturns: [],
                 vendorReturnFields: [
                     { key: 'returnItemName', label: 'Item Name' },
                     { key: 'returnedQty', label: 'Qty Returned' },
@@ -120,7 +145,7 @@
                     { key: 'returnVendor', label: 'Vendor' },
                     { key: 'returnDate', label: 'Date Returned' },
                     { key: 'deliveryDate', label: 'Date Delivered' },
-                    { key: 'edit', label: 'Edit' },
+                    { key: 'delete', label: 'Delete' },
                 ],
                 eBayReturnFields: [
                     { key: 'returnItemName', label: 'Item Name' },
@@ -130,7 +155,7 @@
                     { key: 'returnReason', label: 'Return Reason' },
                     { key: 'warrantyClaim', label: 'Warranty Claim' },
                     { key: 'sendBackToVendor', label: 'Returned To Vendor' },
-                    { key: 'edit', label: 'Edit' },
+                    { key: 'delete', label: 'Delete' },
                 ],
                 paymentMethods: ['Wells Fargo - 4524', 'Wells Fargo - 0777', 'Wells Fargo - 9386', 'Wells Fargo - Checking',
                     'Chase - Amazon', 'Chase - Freedom', 'Chase - Checking',
@@ -156,7 +181,7 @@
             }
         },
         mounted: function () {
-            this.getData();
+            this.getRecords();
         }
     }
 </script>

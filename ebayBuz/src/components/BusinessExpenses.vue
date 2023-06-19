@@ -4,9 +4,10 @@
             <h2>Expense Manager</h2>
         </div>
         <div class="mx-5">
-            <h2>Total eBay Payouts: $ 137,800.5</h2>
-            <h2> Dad Payments: $ 13,000.00</h2>
-            <h2>{{this.currentYear}} Business Expenses to 3/31</h2>
+            <h2>Total eBay Payouts: $ 40,473.51</h2>
+            <h2> Dad Payments: $ 7,100.00</h2>
+            <h5> Note Couldnt check Paypal from 3/31-5/17</h5>
+            <h2>{{this.currentYear}} Business Expenses to 5/17</h2>
             <b-table striped bordered hover :items="businessExpenses" :fields="expenses"></b-table>
             <h2>Insurance Expenses</h2>
             <b-table :items="insuranceExpenses" striped bordered hover :fields="insuranceFields"></b-table>
@@ -242,7 +243,8 @@
                     { key: 'car', label: 'Car' },
                     { key: 'travel', label: 'Travel'},
                     { key: 'miscExpenses', label: 'Misc. Expenses' },
-                    { key: 'taxes', label: 'Taxes'}
+                    { key: 'taxes', label: 'Taxes' },
+                    { key: 'total', label: 'Total'}
                 ],
                 carRecordFields: [
                     { key: 'year', label: 'Year'},
