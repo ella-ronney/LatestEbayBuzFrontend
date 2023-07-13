@@ -2,6 +2,8 @@
     <div>
         <div class="text-center">
             <h2>Resolution Center</h2>
+            <h5> TODO Add delete functionality to ebay returns</h5>
+            <h5> TODO add ability to edit fields to returns </h5>
         </div>
         <div class="mx-5">
             <h2>Vendor Returns</h2>

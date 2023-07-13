@@ -4,8 +4,7 @@
             <h2>Inventory Manager</h2>
         </div>
         <div>
-            <p> TODO Get Delete Working for Inventory table</p>
-            <p> TODO get pagination to match search / filter </p>
+            <h5>Todo Execute some version of combing inventory for combined sell that deducts the qty when making new listing </h5>
             <h5>Total Inventory Investment: {{invInvested}}</h5>
         </div>
         <div class="mx-5">
@@ -31,10 +30,99 @@
                     <b-form-checkbox size="xl" @change="deleteInv(true,data.item)" v-model="data.rowSelected"></b-form-checkbox>
                 </template>
             </b-table>
-            <div style="display: flex; justify-content: flex-end">
-                <!---<button class="btn btn-danger btn-sm" @click="deleteCurrentInv()"><b-icon-trash font-scale="2"></b-icon-trash></button>-->
-                </div>
+        </div>
+        <div class="mx-5">
+            <button class="btn btn-info text-light" style="margin-right: 10px" @click="addSeparateComponents = !addSeparateComponents">Break Down Item Components</button>
+            <button class="btn btn-info text-light" style="margin-right: 10px;" @click="addCombinedSaleRecord = !addCombinedSaleRecord">Create Combined Sale Record </button>
+        </div>
+        <div class="mx-5" v-if="addSeparateComponents">
+            <h2>Separate Item Components</h2>
+            <b-card bg-variant="light">
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Item Id"><b-form-input type="text" v-model="separateItemForm.itemId"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Number of Items need to be separated"><b-form-input type="number" v-model="separateItemForm.unitsToSeparate"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Number of Components Per Item"><b-form-input type="number" v-model="separateItemForm.numberComponents"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5>Components</h5>
+                <b-card v-if="separateItemForm.numberComponents>0">
+                    <p>Component 1</p>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Name"><b-form-input typeof="text" v-model="separateItemForm.nameComponent1"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Qty"><b-form-input type="number" v-model="separateItemForm.qtyComponent1"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Total Price"><b-form-input type="number" v-model="separateItemForm.priceComponent1"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5></h5>
+                <b-card v-if="separateItemForm.numberComponents>1">
+                    <p>Component 2</p>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Name"><b-form-input typeof="text" v-model="separateItemForm.nameComponent2"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Qty"><b-form-input type="number" v-model="separateItemForm.qtyComponent2"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Total Price"><b-form-input type="number" v-model="separateItemForm.priceComponent2"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5></h5>
+                <b-card v-if="separateItemForm.numberComponents>2">
+                    <p>Component 3</p>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Name"><b-form-input typeof="text" v-model="separateItemForm.nameComponent3"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Qty"><b-form-input type="number" v-model="separateItemForm.qtyComponent3"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Total Price"><b-form-input type="number" v-model="separateItemForm.priceComponent3"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5></h5>
+                <b-card v-if="separateItemForm.numberComponents>3">
+                    <p>Component 4</p>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Name"><b-form-input typeof="text" v-model="separateItemForm.nameComponent4"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Qty"><b-form-input type="number" v-model="separateItemForm.qtyComponent4"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Total Price"><b-form-input type="number" v-model="separateItemForm.priceComponent4"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+                <h5></h5>
+                <b-card v-if="separateItemForm.numberComponents>4">
+                    <p>Component 5</p>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Name"><b-form-input typeof="text" v-model="separateItemForm.nameComponent5"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Qty"><b-form-input type="number" v-model="separateItemForm.qtyComponent5"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="Total Price"><b-form-input type="number" v-model="separateItemForm.priceComponent5"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+            </b-card>
+            <div style="display: flex; justify-content: flex-end" class="mt-3">
+                <button class="btn btn-success btn-sm" @click="addSeparateItemComponentsRecord()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
+            </div>          
             </div>
+        <div class="mx-5" v-if="addCombinedSaleRecord">
+            <h2>Create Combined Sale Record</h2>
+            <b-card bg-variant="light">
+                <b-card>
+                    <b-container>
+                        <b-row>
+                            <b-col><b-form-group label="Item Ids"><b-form-input typeof="text" v-model="combinedSaleForm.ids" placeholder="eBayItemId1, eBayItemId2, eBayItemId3"></b-form-input></b-form-group></b-col>
+                            <b-col><b-form-group label="qty"><b-form-input type="number" v-model="combinedSaleForm.qty"></b-form-input></b-form-group></b-col>
+                        </b-row>
+                    </b-container>
+                </b-card>
+            </b-card>
+            <div style="display: flex; justify-content: flex-end" class="mt-3">
+                <button class="btn btn-success btn-sm" @click="AddCombinedSaleRecord()"><b-icon-plus font-scale="2" variant="light"></b-icon-plus></button>
+            </div>
+        </div>
             <div class="mx-5">
                 <h2>Incoming Inventory</h2>
                 <b-table id="incomingInventory" striped bordered hover :items="incoming" :fields="incFields">
@@ -235,6 +323,50 @@
 
                     this.updatedCurrInv = [];
                 },
+                AddCombinedSaleRecord() {
+                    alert(JSON.stringify(this.separateItemForm));
+                    axios.post("https://localhost:44314/inventory/AddCombinedSaleRecord", this.combinedSaleForm)
+                        .then((response) => {
+                            this.combinedSaleForm.ids = '';
+                            this.combinedSaleForm.qty = 0;
+                            console.log(response);
+                        }, (error) => {
+                            this.combinedSaleForm.ids = '';
+                            this.combinedSaleForm.qty = 0;
+                            console.log(error);
+                        });
+                },
+                addSeparateItemComponentsRecord() {
+                    alert(JSON.stringify(this.separateItemForm));
+                    axios.post("https://localhost:44314/inventory/AddSeparateComponentsRecord", this.separateItemForm)
+                        .then((response) => {
+                            this.clearSeparateItemComponentsForm();
+                            console.log(response);
+                        }, (error) => {
+                            this.clearSeparateItemComponentsForm();
+                            console.log(error);
+                        });
+                },
+                clearSeparateItemComponentsForm() {
+                    this.separateItemForm.itemId = '',
+                    this.separateItemForm.unitsToSeparate = 0,
+                    this.separateItemForm.numberComponents = 0,
+                    this.separateItemForm.nameComponent1 = '',
+                    this.separateItemForm.qtyComponent1 = '',
+                    this.separateItemForm.priceComponent1 = '',
+                    this.separateItemForm.nameComponent2 = '',
+                    this.separateItemForm.qtyComponent2 = '',
+                    this.separateItemForm.priceComponent2 = '',
+                    this.separateItemForm.nameComponent3 = '',
+                    this.separateItemForm.qtyComponent3 = '',
+                    this.separateItemForm.priceComponent3 = '',
+                    this.separateItemForm.nameComponent4 = '',
+                    this.separateItemForm.qtyComponent4 = '',
+                    this.separateItemForm.priceComponent4 = '',
+                    this.separateItemForm.nameComponent5 = '',
+                    this.separateItemForm.qtyComponent5 = '',
+                    this.separateItemForm.priceComponent5 = ''
+                },
                 getData() {
                     axios.get("https://localhost:44314/inventory/currentinventory")
                         .then((response) => {
@@ -306,8 +438,32 @@
                     inventoryIdForm: {
                         invName: ''
                     },
+                    combinedSaleForm: {
+                        ids: '',
+                        qty: 0
+                    },
+                    separateItemForm: {
+                        itemId: '',
+                        numberComponents: 0,
+                        unitsToSeparate: 0,
+                        nameComponent1: '',
+                        qtyComponent1: '',
+                        priceComponent1: '',
+                        nameComponent2: '',
+                        qtyComponent2: '',
+                        priceComponent2: '',
+                        nameComponent3: '',
+                        qtyComponent3: '',
+                        priceComponent3: '',
+                        nameComponent4: '',
+                        qtyComponent4: '',
+                        priceComponent4: '',
+                        nameComponent5: '',
+                        qtyComponent5: '',
+                        priceComponent5: ''
+                    },
                     currFields: [
-                        { key: 'ebayItemId', label: 'eBay Item Id' },
+                        { key: 'ebayItemId', label: 'eBay Item Id / Item Id' },
                         { key: 'name', label: 'Name' },
                         { key: 'qty', label: 'Quantity' },
                         { key: 'unitPrice', label: 'Price/Piece' },
@@ -346,6 +502,8 @@
                     updatedCurrInv: [],
                     inventoryId: false,
                     addInv: false,
+                    addSeparateComponents: false,
+                    addCombinedSaleRecord: false,
                     headers: [{
                         text: 'Column',
                         value: 'item'

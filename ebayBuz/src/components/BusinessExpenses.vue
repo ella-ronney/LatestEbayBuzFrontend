@@ -6,7 +6,6 @@
         <div class="mx-5">
             <h2>Total eBay Payouts: $ 40,473.51</h2>
             <h2> Dad Payments: $ 7,100.00</h2>
-            <h5> Note Couldnt check Paypal from 3/31-5/17</h5>
             <h2>{{this.currentYear}} Business Expenses to 5/17</h2>
             <b-table striped bordered hover :items="businessExpenses" :fields="expenses"></b-table>
             <h2>Insurance Expenses</h2>
