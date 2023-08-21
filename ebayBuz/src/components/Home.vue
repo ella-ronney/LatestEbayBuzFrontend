@@ -4,7 +4,6 @@
             <h2>Inventory Manager</h2>
         </div>
         <div>
-            <h5>Todo Execute some version of combing inventory for combined sell that deducts the qty when making new listing </h5>
             <h5>Total Inventory Investment: {{invInvested}}</h5>
         </div>
         <div class="mx-5">
@@ -34,6 +33,9 @@
         <div class="mx-5">
             <button class="btn btn-info text-light" style="margin-right: 10px" @click="addSeparateComponents = !addSeparateComponents">Break Down Item Components</button>
             <button class="btn btn-info text-light" style="margin-right: 10px;" @click="addCombinedSaleRecord = !addCombinedSaleRecord">Create Combined Sale Record </button>
+        </div>
+        <div>
+            <h2>TODO automate picking up price somehow</h2>
         </div>
         <div class="mx-5" v-if="addSeparateComponents">
             <h2>Separate Item Components</h2>
@@ -472,7 +474,7 @@
                         { key: 'datePurchased', label: 'Date Purchased' },
                         { key: 'warranty', label: 'Warranty' },
                         { key: 'returnBy', label: 'Return By' },
-                        { key: 'delete', label: 'Delete' },
+                        { key: 'delete', label: 'Delete' }
                     ],
                     current: [],
                     incoming: [],
@@ -487,7 +489,8 @@
                         { key: 'estimatedDelivery', label: 'Estimated Delivery' },
                         { key: 'trackingNumber', label: 'Tracking' },
                         { key: 'delete', label: 'Delete' },
-                        { key: 'moveCurrInv', label: 'Move Current Inv'}
+                        { key: 'moveCurrInv', label: 'Move Current Inv' },
+                        { key: 'dadPurchased', label: 'Dad Purchased' }
                     ],
                     paymentMethods: ['Wells Fargo - 0777', 'Wells Fargo - 9386', 'Wells Fargo - Checking',
                         'Wells Fargo -  4524', 'Chase - Amazon', 'Chase - Freedom',

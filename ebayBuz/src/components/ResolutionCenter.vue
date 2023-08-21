@@ -11,6 +11,9 @@
                 <template #cell(delete)="data">
                     <b-form-checkbox size="xl" @change="deleteReturn(data.item)" v-model="data.rowSelected"></b-form-checkbox>
                 </template>
+                <template #cell(deliveryDate)="data">
+                    <b-form-datepicker size="sm" v-model="data.value" @change="updateVendorReturn('returnDate', data.item, data.value)" :date-format-options="{year: 'numeric', month: 'numeric', date: 'numeric'}"></b-form-datepicker>
+                </template>
             </b-table>
             <div style="display: flex; justify-content: flex-end">
                 <button class="btn btn-danger btm-sm" @click="deleteVendorReturn()"><b-icon-trash font-scale="2"></b-icon-trash></button>
@@ -88,6 +91,20 @@
     export default {
         name: 'ResolutionCenter',
         methods: {
+            updateVendorReturn(updatedVariableName, item, value) {
+                if (updatedVariableName == 'returnDate') {
+                    item.returnDate = value;
+                    this.updatedVendorReturns.push(item);
+                }
+
+                axios.put("https://localhost:44314/ResolutionCenter/UpdateVendorReturn", this.updatedVendorReturns)
+                    .then((response) => {
+                        console.log(response);
+                    }, (error) => {
+                        console.log(error);
+                    });
+                this.updatedVendorReturns = [];
+            },
             sendReturnForm() {
                 axios.post("https://localhost:44314/ResolutionCenter/AddReturn", this.returnForm)
                     .then((response) => {
@@ -138,8 +155,11 @@
             return {
                 vendorReturns: [],
                 eBayReturns: [],
+                updatedVendorReturns : [],
                 vendorReturnFields: [
                     { key: 'returnItemName', label: 'Item Name' },
+                    { key: 'account', label: 'Account' },
+                    { key: 'orderNumber', label: 'Order Number' },
                     { key: 'returnedQty', label: 'Qty Returned' },
                     { key: 'refundTotal', label: 'Expected Refund' },
                     { key: 'returnTrackingNumber', label: 'Tracking' },
@@ -147,7 +167,7 @@
                     { key: 'returnVendor', label: 'Vendor' },
                     { key: 'returnDate', label: 'Date Returned' },
                     { key: 'deliveryDate', label: 'Date Delivered' },
-                    { key: 'delete', label: 'Delete' },
+                    { key: 'delete', label: 'Delete' }
                 ],
                 eBayReturnFields: [
                     { key: 'returnItemName', label: 'Item Name' },
