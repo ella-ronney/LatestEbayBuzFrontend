@@ -53,6 +53,7 @@
                     <b-card>
                         <b-container>
                             <b-row>
+                                <b-col><b-form-group label="Account"><b-form-input v-model="returnForm.account"></b-form-input></b-form-group></b-col>
                                 <b-col><b-form-group label="Payment Method"><b-form-select v-model="returnForm.paymentMethod" :options="paymentMethods" class="form-select form-select-font-size-lg"></b-form-select></b-form-group></b-col>
                                 <b-col><b-form-group label="Vendor"><b-form-select v-model="returnForm.returnVendor" :options="vendors" class="form-select form-select-font-size-lg"></b-form-select></b-form-group></b-col>
                             </b-row>
@@ -149,6 +150,7 @@
                 this.returnForm.isVendorReturn = '';
                 this.returnForm.returnDate = '';
                 this.returnForm.deliveryDate = '';
+                this.returnForm.account = '';
             },
         },
         data() {
@@ -197,6 +199,7 @@
                     isVendorReturn: 'Yes',
                     returnDate: '',
                     deliveryDate: '',
+                    account: '',
                 },
                 boolOptions: ['Yes', 'No'],
                 returnReason: ['Remorse Return', 'Defective - True', 'Defective - False'],

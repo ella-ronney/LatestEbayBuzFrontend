@@ -4,9 +4,9 @@
             <h2>Expense Manager</h2>
         </div>
         <div class="mx-5">
-            <h2>Total eBay Payouts: $ 40,473.51</h2>
+            <h2>Total eBay Payouts: $ 88,512.93</h2>
             <h2> Dad Payments: $ 7,100.00</h2>
-            <h2>{{this.currentYear}} Business Expenses to 5/17</h2>
+            <h2>{{this.currentYear}} Business Expenses to 9/27</h2>
             <b-table striped bordered hover :items="businessExpenses" :fields="expenses"></b-table>
             <h2>Insurance Expenses</h2>
             <b-table :items="insuranceExpenses" striped bordered hover :fields="insuranceFields"></b-table>

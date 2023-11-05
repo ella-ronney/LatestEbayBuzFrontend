@@ -36,6 +36,7 @@
         </div>
         <div>
             <h2>TODO automate picking up price somehow</h2>
+            <h2>Todo Add Custom name field</h2>
         </div>
         <div class="mx-5" v-if="addSeparateComponents">
             <h2>Separate Item Components</h2>
